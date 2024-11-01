@@ -1,22 +1,22 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { TemplateService } from './app.service'; // Service to handle CRUD
-import { TemplatePreviewComponent } from './app-preview.component'; // Preview dialog
-import { TemplateFormComponent } from './app-form.component'; // Form dialog
-import { Template } from './app.model'; // Import the Template interface
-import { MatTableModule } from '@angular/material/table'; // Import MatTableModule
-import { MatButtonModule } from '@angular/material/button'; // Import MatButtonModule
+import { TemplateService } from './app.service'; 
+import { TemplatePreviewComponent } from './app-preview.component'; 
+import { TemplateFormComponent } from './app-form.component'; 
+import { Template } from './app.model'; // import the Template 
+import { MatTableModule } from '@angular/material/table'; 
+import { MatButtonModule } from '@angular/material/button'; 
 
 @Component({
   selector: 'app-templates',
   standalone: true,
-  imports: [MatTableModule, MatButtonModule], // Add required Material modules
-  templateUrl: './app.component.html', // Ensure this points to the correct HTML file
+  imports: [MatTableModule, MatButtonModule], 
+  templateUrl: './app.component.html', 
+  styleUrl: './app.component.css',
 })
-export class appComponent { // Updated class name to match selector
-  title: string = 'Template Management'; // Updated title property
-
-  templates: Template[] = []; // Declare templates with the correct type
+export class appComponent { 
+  title: string = 'Template Management'; 
+  templates: Template[] = []; 
   displayedColumns: string[] = ['name', 'actions'];
 
   constructor(private dialog: MatDialog, private templateService: TemplateService) {
@@ -31,36 +31,40 @@ export class appComponent { // Updated class name to match selector
     const dialogRef = this.dialog.open(TemplateFormComponent, {
       width: '400px',
     });
-
+  
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.loadTemplates(); // Reload templates after creation
+        this.templateService.addTemplate(result); // save new template
+        this.loadTemplates(); // reload templates 
       }
     });
   }
 
-  previewTemplate(template: Template) {
+  previewTemplate(template: any) {
     this.dialog.open(TemplatePreviewComponent, {
       width: '600px',
       data: { template: template }
     });
   }
 
-  editTemplate(template: Template) {
-    const dialogRef = this.dialog.open(TemplateFormComponent, {
-      width: '400px',
-      data: template // Pass the template to the form for editing
-    });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.loadTemplates(); // Reload templates after editing
-      }
-    });
-  }
+editTemplate(template: any) {
+  const dialogRef = this.dialog.open(TemplateFormComponent, {
+    width: '400px',
+    data: template // edit
+  });
+
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      result.id = template.id; 
+      this.templateService.updateTemplate(result); 
+      this.loadTemplates(); 
+    }
+  });
+}
 
   deleteTemplate(template: Template) {
     this.templateService.deleteTemplate(template.id);
-    this.loadTemplates(); // Reload after deletion
+    this.loadTemplates(); // deletion
   }
 }

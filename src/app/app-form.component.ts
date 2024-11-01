@@ -1,3 +1,4 @@
+// template-form.component.ts
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormGroup, FormBuilder, ReactiveFormsModule } from '@angular/forms';
@@ -28,6 +29,10 @@ import { MatButtonModule } from '@angular/material/button';
           <mat-label>Template Content</mat-label>
           <textarea matInput formControlName="content"></textarea>
         </mat-form-field>
+        <mat-form-field>
+          <mat-label>Template JSON Data</mat-label>
+          <textarea matInput formControlName="jsonData" placeholder='{"key": "value"}'></textarea>
+        </mat-form-field>
       </form>
     </div>
     <div mat-dialog-actions>
@@ -46,7 +51,8 @@ export class TemplateFormComponent {
   ) {
     this.templateForm = this.fb.group({
       name: [data ? data.name : ''],
-      content: [data ? data.content : '']
+      content: [data ? data.content : ''],
+      jsonData: [data ? JSON.stringify(data.jsonData, null, 2) : ''] // JSON as string input
     });
   }
 
@@ -56,6 +62,7 @@ export class TemplateFormComponent {
 
   onSave(): void {
     const formValue = this.templateForm.value;
+    formValue.jsonData = formValue.jsonData ? JSON.parse(formValue.jsonData) : {}; // Parse JSON string
     this.dialogRef.close(formValue);
   }
 }
